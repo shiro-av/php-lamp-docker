@@ -17,6 +17,8 @@
     <input type="password" id="password" name="password"><br><br>
     <label for="dbname">Название базы данных:</label>
     <input type="text" id="dbname" name="dbname"><br><br>
+    <label for="tablename">Название таблицы:</label>
+    <input type="text" id="tablename" name="tablename"><br><br>
     <button type="submit" name="create">Создать базу данных</button>
 </form>
 
@@ -42,6 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST["username"];
     $password = $_POST["password"];
     $dbname = $_POST["dbname"];
+    $tablename = $_POST["tablename"];
 
     // Подключение к серверу MySQL
     $conn = new mysqli($server, $username, $password);
@@ -56,17 +59,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Создание новой базы данных
         $sql = "CREATE DATABASE IF NOT EXISTS $dbname";
         if ($conn->query($sql) === TRUE) {
-            echo "База данных успешно создана";
+            echo "База данных успешно создана<br>";
+            $conn->select_db($dbname);
+            $sql_create_table = "
+                CREATE TABLE IF NOT EXISTS $tablename (
+                id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                firstname VARCHAR(30) NOT NULL,
+                lastname VARCHAR(30) NOT NULL,
+                email VARCHAR(50),
+                reg_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            )";
+            if ($conn->query($sql_create_table) === TRUE) {
+                echo "Таблица $tablename успешно создана<br>";
+            } else {
+                echo "Ошибка при создании таблицы: " . $conn->error . "<br>";
+            }
         } else {
-            echo "Ошибка при создании базы данных: " . $conn->error;
+            echo "Ошибка при создании базы данных: " . $conn->error . "<br>";
         }
     } elseif (isset($_POST["delete"])) {
         // Удаление базы данных
         $sql = "DROP DATABASE IF EXISTS $dbname";
         if ($conn->query($sql) === TRUE) {
-            echo "База данных успешно удалена";
+            echo "База данных успешно удалена<br>";
         } else {
-            echo "Ошибка при удалении базы данных: " . $conn->error;
+            echo "Ошибка при удалении базы данных: " . $conn->error . "<br>";
         }
     }
 
