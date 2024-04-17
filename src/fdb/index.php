@@ -37,6 +37,7 @@
 </form>
 
 <?php
+session_start();
 // Проверяем, была ли отправлена форма
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Получаем данные из формы
@@ -52,6 +53,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Проверка соединения на наличие ошибок
     if ($conn->connect_error) {
         die("Ошибка подключения: " . $conn->connect_error);
+    } else {
+        setcookie('server', $server, time() + (86400 * 30), "/"); // Сохраняем на 30 дней
+        setcookie('username', $username, time() + (86400 * 30), "/");
+        setcookie('password', $password, time() + (86400 * 30), "/");
+        setcookie('dbname', $dbname, time() + (86400 * 30), "/");
+        setcookie('tablename', $tablename, time() + (86400 * 30), "/");
     }
 
     // Проверяем, какая кнопка была нажата
